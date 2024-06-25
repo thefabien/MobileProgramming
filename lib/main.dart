@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'calculator_screen.dart';
+import 'sign_in_screen.dart';
+import 'sign_up_screen.dart';
 
 void main() => runApp(MyApp());
 
@@ -6,148 +9,105 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Calculator(), //MaterialApp
+      title: 'Your App',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: MainScreen(),
     );
   }
 }
 
-class Calculator extends StatefulWidget {
+class MainScreen extends StatefulWidget {
   @override
-  _CalculatorState createState() => _CalculatorState();
+  _MainScreenState createState() => _MainScreenState();
 }
 
-class _CalculatorState extends State<Calculator> {
-  String output = "0";
-  String _output = "0";
-  String operand = "";
-  double num1 = 0;
-  double num2 = 0;
+class _MainScreenState extends State<MainScreen> {
+  int _currentIndex = 0;
+  final List<Widget> _children = [
+    SignInScreen(),
+    SignUpScreen(),
+    Calculator(),
+  ];
 
-  buttonPressed(String buttonText) {
-    if (buttonText == "CLEAR") {
-      _output = "0";
-      num1 = 0;
-      num2 = 0;
-      operand = "";
-    } else if (buttonText == "+" ||
-        buttonText == "-" ||
-        buttonText == "x" ||
-        buttonText == "/") {
-      num1 = double.parse(output);
-      operand = buttonText;
-      _output = "0";
-    } else if (buttonText == ".") {
-      if (_output.contains(".")) {
-        print("Already contains a decimals");
-        return;
-      } else {
-        _output = _output + buttonText;
-      }
-    } else if (buttonText == "=") {
-      num2 = double.parse(output);
-
-      if (operand == "+") {
-        _output = (num1 + num2).toString();
-      }
-      if (operand == "-") {
-        _output = (num1 - num2).toString();
-      }
-      if (operand == "x") {
-        _output = (num1 * num2).toString();
-      }
-      if (operand == "/") {
-        _output = (num1 / num2).toString();
-      }
-
-      num1 = 0;
-      num2 = 0;
-      operand = "";
-    } else {
-      _output = _output + buttonText;
-    }
-
+  void onTabTapped(int index) {
     setState(() {
-      output = double.parse(_output).toStringAsFixed(2);
+      _currentIndex = index;
     });
-  }
-
-  Widget buildButton(String buttonText) {
-    return Expanded(
-      child: OutlinedButton(
-        style: OutlinedButton.styleFrom(
-          padding: EdgeInsets.all(24.0),
-        ),
-        child: Text(
-          buttonText,
-          style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-        ),
-        onPressed: () => buttonPressed(buttonText),
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
       appBar: AppBar(
-        title: Text('Calculator'),
-        backgroundColor: Colors.black,
+        title: Text('Simple Calculator'),
+        backgroundColor:
+            Color.fromARGB(255, 108, 108, 131), // Grey color for the header
       ),
-      body: Container(
-        child: Column(
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
           children: <Widget>[
-            Container(
-              alignment: Alignment.centerRight,
-              padding: EdgeInsets.symmetric(
-                vertical: 24.0,
-                horizontal: 12.0,
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.grey[800], // Grey color for the drawer header
               ),
               child: Text(
-                output,
+                'Menu',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 48.0,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
                 ),
               ),
             ),
-            Expanded(
-              child: Divider(),
+            ListTile(
+              leading: Icon(Icons.login),
+              title: Text('Sign In'),
+              onTap: () {
+                onTabTapped(0);
+                Navigator.pop(context);
+              },
             ),
-            Column(children: [
-              Row(children: [
-                buildButton("7"),
-                buildButton("8"),
-                buildButton("9"),
-                buildButton("/")
-              ]),
-              Row(children: [
-                buildButton("4"),
-                buildButton("5"),
-                buildButton("6"),
-                buildButton("x")
-              ]),
-              Row(children: [
-                buildButton("1"),
-                buildButton("2"),
-                buildButton("3"),
-                buildButton("-")
-              ]),
-              Row(children: [
-                buildButton("."),
-                buildButton("0"),
-                buildButton("00"),
-                buildButton("+")
-              ]),
-              Row(children: [
-                buildButton("CLEAR"),
-                buildButton("="),
-              ]),
-            ])
+            ListTile(
+              leading: Icon(Icons.person_add),
+              title: Text('Sign Up'),
+              onTap: () {
+                onTabTapped(1);
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.calculate),
+              title: Text('Calculator'),
+              onTap: () {
+                onTabTapped(2);
+                Navigator.pop(context);
+              },
+            ),
           ],
         ),
+      ),
+      body: _children[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        onTap: onTabTapped,
+        currentIndex: _currentIndex,
+        backgroundColor:
+            Colors.grey[800], // Grey color for the BottomNavigationBar
+        selectedItemColor: Colors.blue,
+        unselectedItemColor: Colors.white,
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.login),
+            label: 'Sign In',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_add),
+            label: 'Sign Up',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calculate),
+            label: 'Calculator',
+          ),
+        ],
       ),
     );
   }
