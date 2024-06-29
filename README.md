@@ -1,3 +1,7 @@
+![Image of my app second assgnment](WhatsApp Image 2024-06-29 at 2.57.30 PM.jpeg)
+![Image of my app second assgnment](WhatsApp Image 2024-06-29 at 2.57.32 PM (1).jpeg)
+![Image of my app second assgnment](WhatsApp Image 2024-06-29 at 2.57.32 PM.jpeg)
+![Image of my app second assgnment](WhatsApp Image 2024-06-29 at 2.57.33 PM.jpeg)
 # simple_calculator
 
 A new Flutter project.
