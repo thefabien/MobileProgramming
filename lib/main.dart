@@ -2,32 +2,76 @@ import 'package:flutter/material.dart';
 import 'calculator_screen.dart';
 import 'sign_in_screen.dart';
 import 'sign_up_screen.dart';
+import 'theme_service.dart';
 
-void main() => runApp(MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final themeMode = await ThemeService.getThemeMode();
+  runApp(MyApp(initialThemeMode: themeMode));
+}
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  final ThemeMode initialThemeMode;
+
+  const MyApp({Key? key, required this.initialThemeMode}) : super(key: key);
+
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late ThemeMode _themeMode;
+
+  @override
+  void initState() {
+    super.initState();
+    _themeMode = widget.initialThemeMode;
+  }
+
+  void _setThemeMode(ThemeMode mode) {
+    setState(() {
+      _themeMode = mode;
+    });
+    ThemeService.setThemeMode(mode);
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Your App',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: MainScreen(),
+      darkTheme: ThemeData.dark().copyWith(
+        primaryColor: Colors.blue,
+        appBarTheme: AppBarTheme(color: Color.fromARGB(255, 108, 108, 131)),
+      ),
+      themeMode: _themeMode,
+      home: MainScreen(onThemeModeChanged: _setThemeMode),
     );
   }
 }
 
 class MainScreen extends StatefulWidget {
+  final Function(ThemeMode) onThemeModeChanged;
+
+  MainScreen({Key? key, required this.onThemeModeChanged}) : super(key: key);
+
   @override
   _MainScreenState createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
-  final List<Widget> _children = [
-    SignInScreen(),
-    SignUpScreen(),
-    Calculator(),
-  ];
+  late List<Widget> _children;
+
+  @override
+  void initState() {
+    super.initState();
+    _children = [
+      SignInScreen(),
+      SignUpScreen(),
+      Calculator(),
+    ];
+  }
 
   void onTabTapped(int index) {
     setState(() {
@@ -40,8 +84,29 @@ class _MainScreenState extends State<MainScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Simple Calculator'),
-        backgroundColor:
-            Color.fromARGB(255, 108, 108, 131), // Grey color for the header
+        backgroundColor: Color.fromARGB(255, 108, 108, 131),
+        actions: [
+          DropdownButton<ThemeMode>(
+            value: Theme.of(context).brightness == Brightness.dark
+                ? ThemeMode.dark
+                : ThemeMode.light,
+            onChanged: (ThemeMode? newMode) {
+              if (newMode != null) {
+                widget.onThemeModeChanged(newMode);
+              }
+            },
+            items: [
+              DropdownMenuItem(
+                value: ThemeMode.light,
+                child: Icon(Icons.light_mode),
+              ),
+              DropdownMenuItem(
+                value: ThemeMode.dark,
+                child: Icon(Icons.dark_mode),
+              ),
+            ],
+          ),
+        ],
       ),
       drawer: Drawer(
         child: ListView(
@@ -49,7 +114,7 @@ class _MainScreenState extends State<MainScreen> {
           children: <Widget>[
             DrawerHeader(
               decoration: BoxDecoration(
-                color: Colors.grey[800], // Grey color for the drawer header
+                color: Colors.grey[800],
               ),
               child: Text(
                 'Menu',
@@ -90,8 +155,7 @@ class _MainScreenState extends State<MainScreen> {
       bottomNavigationBar: BottomNavigationBar(
         onTap: onTabTapped,
         currentIndex: _currentIndex,
-        backgroundColor:
-            Colors.grey[800], // Grey color for the BottomNavigationBar
+        backgroundColor: Colors.grey[800],
         selectedItemColor: Colors.blue,
         unselectedItemColor: Colors.white,
         items: [

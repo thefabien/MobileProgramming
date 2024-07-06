@@ -11,6 +11,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
   String _email = '';
   String _password = '';
   String _confirmPassword = '';
+  String _error = '';
+
+  void _signUp() {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      // Perform sign-up logic (without AuthService)
+      if (_password == _confirmPassword) {
+        // Simulate a successful sign-up
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Sign up successful!')),
+        );
+        // Navigate to home screen or perform other actions
+      } else {
+        setState(() {
+          _error = 'Passwords do not match. Please try again.';
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,17 +112,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
               SizedBox(height: 24.0),
               ElevatedButton(
                 child: Text('Sign Up'),
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    _formKey.currentState!.save();
-                    // Here you would typically send the sign-up data to your backend
-                    print('Name: $_name, Email: $_email, Password: $_password');
-                    // Show a success message or navigate to another screen
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Sign up successful!')),
-                    );
-                  }
-                },
+                onPressed: _signUp,
+              ),
+              SizedBox(height: 12.0),
+              Text(
+                _error,
+                style: TextStyle(color: Colors.red, fontSize: 14.0),
               ),
             ],
           ),

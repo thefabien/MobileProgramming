@@ -1,3 +1,6 @@
+dependences{
+    classpath 'com.google.gms:google-service:4.0.1'
+}
 allprojects {
     repositories {
         google()
